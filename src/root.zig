@@ -15,6 +15,16 @@ var file_logfile_options: logfile.Options = undefined;
 var file_logfmt_options: logfmt.WriteOptions = undefined;
 var initialized: bool = false;
 
+fn isAllowedScope(comptime scope: @EnumLiteral()) bool {
+    const root = @import("root");
+
+    if (comptime @hasDecl(root, "AllowedLogScope")) {
+        return comptime std.meta.stringToEnum(root.AllowedLogScope, @tagName(scope)) != null;
+    }
+
+    return true;
+}
+
 pub fn logFn(
     comptime level: std.log.Level,
     comptime scope: @EnumLiteral(),
@@ -22,6 +32,8 @@ pub fn logFn(
     args: anytype,
 ) void {
     std.debug.assert(initialized);
+
+    if (!isAllowedScope(scope)) return;
 
     const now = std.Io.Timestamp.now(global_io, .real);
     var buffer: [64]u8 = undefined;
