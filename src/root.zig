@@ -61,3 +61,8 @@ pub fn deinit() void {
     if (file_enabled) logfile.deinit();
     initialized = false;
 }
+
+pub fn updateTz(new_offset: i32) void {
+    terminal_logfmt_options.timezone_offset = new_offset;
+    if (file_enabled) file_logfmt_options.timezone_offset = new_offset;
+}

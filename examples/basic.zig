@@ -12,5 +12,7 @@ pub fn main(init: std.process.Init) !void {
     });
     defer logger.deinit();
 
+    logger.updateTz(8 * 60);
+
     std.log.info("Hello: {d}", .{42});
 }
