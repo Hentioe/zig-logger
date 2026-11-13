@@ -3,7 +3,12 @@
     .version = "0.0.0",
     .fingerprint = 0xd42ec874d0336191, // Changing this has security and trust implications.
     .minimum_zig_version = "0.17.1",
-    .dependencies = .{},
+    .dependencies = .{
+        .zig_logfmt = .{
+            .url = "git+https://github.com/Hentioe/zig-logfmt#0e77b09077afffb8d22ddc791e6c54816afdee19",
+            .hash = "zig_logfmt-0.0.0-2C2REi8UAAAhce6wIAh6yHACyhMdlIc3_9J0xakiVd6p",
+        },
+    },
     .paths = .{
         "build.zig",
         "build.zig.zon",
