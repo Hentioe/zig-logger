@@ -2,10 +2,10 @@ const std = @import("std");
 const logger = @import("zig_logger");
 
 pub const std_options: std.Options = .{ .logFn = logger.logFn };
-pub const AllowedLogScope = enum { default };
+pub const log_options: logger.Options = .{ .allowed_scopes = enum { default } };
 
 pub fn main(init: std.process.Init) !void {
-    try logger.init(init.io, .{
+    try logger.setup(init.io, .{
         .file = .{
             .gpa = init.gpa,
             .logfile = .{ .log_file_name = "dev.log" },

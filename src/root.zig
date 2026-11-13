@@ -5,6 +5,7 @@ const logfmt = @import("zig_logfmt");
 const logfile = @import("zig_logfile");
 
 pub const Options = @import("Options.zig");
+pub const SetupOptions = @import("SetupOptions.zig");
 pub const WriteOptions = logfmt.WriteOptions;
 
 var global_io: Io = undefined;
@@ -18,8 +19,8 @@ var initialized: bool = false;
 fn isAllowedScope(comptime scope: @EnumLiteral()) bool {
     const root = @import("root");
 
-    if (comptime @hasDecl(root, "AllowedLogScope")) {
-        return comptime std.meta.stringToEnum(root.AllowedLogScope, @tagName(scope)) != null;
+    if (comptime @hasDecl(root, "log_options") and root.log_options.allowed_scopes != null) {
+        return comptime std.meta.stringToEnum(root.log_options.allowed_scopes.?, @tagName(scope)) != null;
     }
 
     return true;
@@ -34,16 +35,17 @@ pub fn logFn(
     std.debug.assert(initialized);
 
     if (!isAllowedScope(scope)) return;
-
     const now = std.Io.Timestamp.now(global_io, .real);
-    var buffer: [64]u8 = undefined;
-    const stderr = std.debug.lockStderr(&buffer).terminal();
-    defer std.debug.unlockStderr();
-
     var formatted = logfmt.format(level, scope, format, args);
     formatted.timestamp = now;
 
-    formatted.write(.{ .terminal = stderr }, terminal_logfmt_options) catch return;
+    { // 写入到 stderr，收窄作用域快速释放锁
+        var buffer: [64]u8 = undefined;
+        const stderr = std.debug.lockStderr(&buffer).terminal();
+        defer std.debug.unlockStderr();
+
+        formatted.write(.{ .terminal = stderr }, terminal_logfmt_options) catch return;
+    }
 
     if (file_enabled) {
         var allocating: std.Io.Writer.Allocating = .init(global_gpa);
@@ -52,7 +54,7 @@ pub fn logFn(
     }
 }
 
-pub fn init(io: Io, options: Options) !void {
+pub fn setup(io: Io, options: SetupOptions) !void {
     std.debug.assert(!initialized);
 
     global_io = io;
