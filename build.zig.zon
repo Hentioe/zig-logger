@@ -8,6 +8,10 @@
             .url = "git+https://github.com/Hentioe/zig-logfmt#0e77b09077afffb8d22ddc791e6c54816afdee19",
             .hash = "zig_logfmt-0.0.0-2C2REi8UAAAhce6wIAh6yHACyhMdlIc3_9J0xakiVd6p",
         },
+        .zig_logfile = .{
+            .url = "git+https://github.com/Hentioe/zig-logfile#3daf91385aca65b60bbf041a2483039f86cbcb14",
+            .hash = "zig_logfile-0.0.0-9SSjnR0fAAD8Z4i5AS39AeySSAatzZcI4JXHlxzSQdKq",
+        },
     },
     .paths = .{
         "build.zig",

@@ -4,6 +4,7 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
 
     const zig_logfmt = b.dependency("zig_logfmt", .{});
+    const zig_logfile = b.dependency("zig_logfile", .{});
 
     const mod = b.addModule("zig_logger", .{
         .root_source_file = b.path("src/root.zig"),
@@ -11,6 +12,7 @@ pub fn build(b: *std.Build) void {
     });
 
     mod.addImport("zig_logfmt", zig_logfmt.module("zig_logfmt"));
+    mod.addImport("zig_logfile", zig_logfile.module("zig_logfile"));
 
     const example = b.addExecutable(.{
         .name = "basic",
