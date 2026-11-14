@@ -33,8 +33,6 @@ pub fn logFn(
     comptime format: []const u8,
     args: anytype,
 ) void {
-    if (builtin.mode == .debug) std.debug.assert(initialized);
-
     if (!isAllowedScope(scope)) return;
     const now = std.Io.Timestamp.now(global_io, .real);
     var formatted = logfmt.format(level, scope, format, args);
@@ -74,6 +72,7 @@ pub fn deinit() void {
     std.debug.assert(initialized);
 
     if (file_enabled) logfile.deinit();
+    file_enabled = false;
     initialized = false;
 }
 
