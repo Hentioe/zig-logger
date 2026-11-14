@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 const Io = std.Io;
 const Allocator = std.mem.Allocator;
 const logfmt = @import("zig_logfmt");
@@ -32,7 +33,7 @@ pub fn logFn(
     comptime format: []const u8,
     args: anytype,
 ) void {
-    std.debug.assert(initialized);
+    if (builtin.mode == .debug) std.debug.assert(initialized);
 
     if (!isAllowedScope(scope)) return;
     const now = std.Io.Timestamp.now(global_io, .real);
