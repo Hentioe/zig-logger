@@ -4,6 +4,7 @@ const Io = std.Io;
 const Allocator = std.mem.Allocator;
 const logfmt = @import("zig_logfmt");
 const logfile = @import("zig_logfile");
+const Level = std.log.Level;
 
 pub const Options = @import("Options.zig");
 pub const SetupOptions = @import("SetupOptions.zig");
@@ -15,6 +16,7 @@ var terminal_logfmt_options: logfmt.WriteOptions = undefined;
 var file_enabled: bool = false;
 var file_logfile_options: logfile.Options = undefined;
 var file_logfmt_options: logfmt.WriteOptions = undefined;
+var max_level: u2 = @backingInt(Level.debug);
 var initialized: bool = false;
 
 fn isAllowedScope(comptime scope: @EnumLiteral()) bool {
@@ -28,12 +30,13 @@ fn isAllowedScope(comptime scope: @EnumLiteral()) bool {
 }
 
 pub fn logFn(
-    comptime level: std.log.Level,
+    comptime level: Level,
     comptime scope: @EnumLiteral(),
     comptime format: []const u8,
     args: anytype,
 ) void {
-    if (!isAllowedScope(scope)) return;
+    if (builtin.mode == .debug) std.debug.assert(initialized);
+    if (@backingInt(level) > max_level or !isAllowedScope(scope)) return;
     const now = std.Io.Timestamp.now(global_io, .real);
     var formatted = logfmt.format(level, scope, format, args);
     formatted.timestamp = now;
@@ -58,6 +61,7 @@ pub fn setup(io: Io, options: SetupOptions) !void {
 
     global_io = io;
     terminal_logfmt_options = options.terminal.logfmt;
+    max_level = @backingInt(options.runtime_level orelse .debug);
     if (options.file) |file_opts| {
         global_gpa = file_opts.gpa;
         try logfile.init(global_io, global_gpa, file_opts.logfile);
@@ -69,14 +73,15 @@ pub fn setup(io: Io, options: SetupOptions) !void {
 }
 
 pub fn deinit() void {
-    std.debug.assert(initialized);
-
     if (file_enabled) logfile.deinit();
     file_enabled = false;
-    initialized = false;
 }
 
 pub fn updateTz(new_offset: i32) void {
     terminal_logfmt_options.timezone_offset = new_offset;
     if (file_enabled) file_logfmt_options.timezone_offset = new_offset;
+}
+
+pub fn updateRuntimeLevel(new_level: Level) void {
+    max_level = @backingInt(new_level);
 }
