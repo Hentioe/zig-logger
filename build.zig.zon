@@ -5,8 +5,8 @@
     .minimum_zig_version = "0.17.1",
     .dependencies = .{
         .zig_logfmt = .{
-            .url = "git+https://github.com/Hentioe/zig-logfmt#a925389ef1f3d108d59815e2e1c283ec6412fce3",
-            .hash = "zig_logfmt-0.0.0-2C2REqAXAAD211ofu8Ru0NDoCV9PJOek1as6MSLF9xmP",
+            .url = "git+https://github.com/Hentioe/zig-logfmt#35aef7f069363ce6c3a925e4d5fdf3a0e93f1718",
+            .hash = "zig_logfmt-0.0.0-2C2REl8YAABWm3izUnS79Su5DEzgaLV8S8ikFPn56NLO",
         },
         .zig_logfile = .{
             .url = "git+https://github.com/Hentioe/zig-logfile#3daf91385aca65b60bbf041a2483039f86cbcb14",
