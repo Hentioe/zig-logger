@@ -12,7 +12,10 @@ pub const WriteOptions = logfmt.WriteOptions;
 
 var global_io: Io = undefined;
 var global_gpa: Allocator = undefined;
-var terminal_logfmt_options: logfmt.WriteOptions = undefined;
+var terminal_logfmt_options: logfmt.WriteOptions = .{ // 后备选项，即使初始化失败也能完成格式化
+    .hide_time = true,
+    .hide_scope = true,
+};
 var file_enabled: bool = false;
 var file_logfile_options: logfile.Options = undefined;
 var file_logfmt_options: logfmt.WriteOptions = undefined;
@@ -35,11 +38,12 @@ pub fn logFn(
     comptime format: []const u8,
     args: anytype,
 ) void {
-    if (builtin.mode == .debug) std.debug.assert(initialized);
     if (@backingInt(level) > max_level or !isAllowedScope(scope)) return;
-    const now = std.Io.Timestamp.now(global_io, .real);
     var formatted = logfmt.format(level, scope, format, args);
-    formatted.timestamp = now;
+    if (initialized) { // 未初始化成功，不获取时间
+        const now = std.Io.Timestamp.now(global_io, .real);
+        formatted.timestamp = now;
+    }
 
     { // 写入到 stderr，收窄作用域快速释放锁
         var buffer: [64]u8 = undefined;
@@ -49,7 +53,7 @@ pub fn logFn(
         formatted.write(.{ .terminal = stderr }, terminal_logfmt_options) catch return;
     }
 
-    if (file_enabled) {
+    if (file_enabled) { // 若未初始化，此选项始终是 false，是安全的
         var allocating: std.Io.Writer.Allocating = .init(global_gpa);
         formatted.write(.{ .raw = &allocating.writer }, file_logfmt_options) catch {};
         logfile.push(allocating);
