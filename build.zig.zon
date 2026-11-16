@@ -9,8 +9,8 @@
             .hash = "zig_logfmt-0.0.0-2C2REl8YAABWm3izUnS79Su5DEzgaLV8S8ikFPn56NLO",
         },
         .zig_logfile = .{
-            .url = "git+https://github.com/Hentioe/zig-logfile#3daf91385aca65b60bbf041a2483039f86cbcb14",
-            .hash = "zig_logfile-0.0.0-9SSjnR0fAAD8Z4i5AS39AeySSAatzZcI4JXHlxzSQdKq",
+            .url = "git+https://github.com/Hentioe/zig-logfile#4fc09a7b325a7c8c6146cb801ce816ecd31709e6",
+            .hash = "zig_logfile-0.0.0-9SSjnRwfAABe-rwsnEe-29fxC6DtT_tnhvOQDxdYcUQP",
         },
     },
     .paths = .{

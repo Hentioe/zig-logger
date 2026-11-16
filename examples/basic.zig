@@ -26,4 +26,8 @@ pub fn main(init: std.process.Init) !void {
     std.log.info("Hello: {d}", .{2});
     std.log.warn("Hello: {d}", .{1});
     std.log.err("Hello: {d}", .{0});
+
+    // 故意发出 logfile 的日志
+    const logfile_log = std.log.scoped(.logfile);
+    logfile_log.info("Hello: {d} (logfile)", .{42}); // 此日志将被忽略写入到文件
 }

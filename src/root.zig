@@ -1,10 +1,10 @@
 const std = @import("std");
-const builtin = @import("builtin");
 const Io = std.Io;
 const Allocator = std.mem.Allocator;
+const Timestamp = Io.Timestamp;
+const Level = std.log.Level;
 const logfmt = @import("zig_logfmt");
 const logfile = @import("zig_logfile");
-const Level = std.log.Level;
 
 pub const Options = @import("Options.zig");
 pub const SetupOptions = @import("SetupOptions.zig");
@@ -39,11 +39,10 @@ pub fn logFn(
     args: anytype,
 ) void {
     if (@backingInt(level) > max_level or !isAllowedScope(scope)) return;
+    var timestamp: ?Timestamp = null;
+    if (initialized) timestamp = Timestamp.now(global_io, .real); // 未初始化时，不获取时间
     var formatted = logfmt.format(level, scope, format, args);
-    if (initialized) { // 未初始化成功，不获取时间
-        const now = std.Io.Timestamp.now(global_io, .real);
-        formatted.timestamp = now;
-    }
+    formatted.timestamp = timestamp;
 
     { // 写入到 stderr，收窄作用域快速释放锁
         var buffer: [64]u8 = undefined;
@@ -53,7 +52,9 @@ pub fn logFn(
         formatted.write(.{ .terminal = stderr }, terminal_logfmt_options) catch return;
     }
 
-    if (file_enabled) { // 若未初始化，此选项始终是 false，是安全的
+    if (file_enabled // 若未初始化，此选项始终是 false，调用 push 是安全的
+    and scope != .logfile // logfile 自己也会产生日志，避免将自身消息 push
+    ) {
         var allocating: std.Io.Writer.Allocating = .init(global_gpa);
         formatted.write(.{ .raw = &allocating.writer }, file_logfmt_options) catch {};
         logfile.push(allocating);
