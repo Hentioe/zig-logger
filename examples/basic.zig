@@ -5,7 +5,7 @@ pub const std_options: std.Options = .{
     .logFn = logger.logFn,
     .log_level = .debug,
 };
-pub const log_options: logger.Options = .{ .allowed_scopes = enum { default } };
+pub const log_options: logger.Options = .{ .allowed_scopes = enum { default, logger, logfile } };
 
 pub fn main(init: std.process.Init) !void {
     const runtime_level: std.log.Level = .debug;

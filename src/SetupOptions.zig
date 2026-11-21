@@ -5,7 +5,7 @@ const Level = std.log.Level;
 
 pub const FileOptions = struct {
     gpa: std.mem.Allocator,
-    logfile: logfile.Options,
+    logfile: logfile.Sink.Options,
     logfmt: logfmt.WriteOptions = .{},
 };
 
